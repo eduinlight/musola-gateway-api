@@ -1,0 +1,14 @@
+version: "3.4"
+
+services: 
+  database:
+    image: "mongo:5.0.4"
+    container_name: "gateway-db"
+    networks:
+      - server
+    ports:
+      - 27017:27017
+
+networks:
+  server:
+

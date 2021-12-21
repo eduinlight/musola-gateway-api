@@ -1,0 +1,45 @@
+version: "3.4"
+
+services: 
+  database:
+    image: "mongo:5.0.4"
+    container_name: "musolatest-gateways-db"
+    restart: always
+    networks:
+      - server
+      - db
+    volumes:
+      - ~/gateways-api/mongodb-data:/data/db
+    ports:
+      - 127.0.0.1:27017:27017
+  backup:
+    image: tutum/mongodb-backup
+    container_name: "musolatest-gateways-db-backup"
+    restart: always
+    networks:
+      - db
+    environment:
+      - MONGODB_HOST=musolatest-gateways-db
+      - MONGODB_PORT=27017
+      - MAX_BACKUPS=30
+      - INIT_BACKUP=true
+    volumes:
+      - ~/gateways-api/mongodb-backups:/backup
+    depends_on:
+      - database
+  api:
+    image: "${MUSOLATEST_GATEWAYS_API_IMAGE_NAME}"
+    container_name: "musolatest-gateways-api"
+    restart: always
+    environment:
+      - MONGO_URI=mongodb://musolatest-gateways-db:27017/musolatest-gateways-db
+    networks:
+      - server
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - database
+
+networks:
+  db:
+  server:

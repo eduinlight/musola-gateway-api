@@ -1,0 +1,20 @@
+.node: &node
+  image: node:14.17.6-alpine
+
+.npm_install: &npm_install
+  before_script:
+    - apk add -U python make g++
+    - npm install
+
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  <<: *node
+  <<: *npm_install
+  script:
+    - npx tsc
+    - npm run lint
+    - npm run test
